@@ -621,6 +621,41 @@ tbody tr:hover {
   margin-bottom: 40px;
 }
 
+/* Web Digital Executive Card View Modal */
+.modal-content.web-doc {
+  background: rgba(15, 23, 42, 0.95);
+  color: #f8fafc;
+  width: 100%;
+  max-width: 960px;
+  padding: 32px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8);
+  margin-bottom: 40px;
+}
+
+.web-report-field {
+  background: rgba(30, 41, 59, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  margin-bottom: 18px;
+}
+
+.web-report-field label {
+  font-size: 0.88rem;
+  color: var(--accent-cyan);
+  font-weight: 600;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.web-report-field .value {
+  font-size: 1.05rem;
+  color: #f1f5f9;
+  line-height: 1.6;
+}
+
 .doc-header {
   text-align: center;
   margin-bottom: 24px;
@@ -684,7 +719,7 @@ tbody tr:hover {
   body * {
     visibility: hidden;
   }
-  .modal-overlay, .modal-content, .modal-content * {
+  .modal-overlay, .modal-content.a4-doc, .modal-content.a4-doc * {
     visibility: visible;
   }
   .modal-overlay {

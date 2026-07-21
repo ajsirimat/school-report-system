@@ -243,8 +243,9 @@ async function loadReports() {
           <td>${item.training_date || '-'}</td>
           <td><span class="tag-year">ปี ${item.academic_year || '2569'}</span></td>
           <td style="text-align: right;">
-            <button class="btn btn-primary" style="padding: 6px 14px; font-size: 0.85rem;" onclick="viewPrintDoc(${item.id})">🖨️ ดู/พิมพ์ A4</button>
-            <button class="btn btn-danger" style="padding: 6px 14px; font-size: 0.85rem;" onclick="deleteReport(${item.id})">🗑️</button>
+            <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.85rem;" onclick="viewWebDoc(${item.id})">👁️ รายงานดิจิทัล</button>
+            <button class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85rem;" onclick="viewPrintDoc(${item.id})">🖨️ พิมพ์ A4</button>
+            <button class="btn btn-danger" style="padding: 6px 10px; font-size: 0.85rem;" onclick="deleteReport(${item.id})">🗑️</button>
           </td>
         </tr>
       `;
@@ -276,6 +277,86 @@ async function deleteReport(id) {
   }
 }
 
+// View Web Digital Executive Card Modal (Matches user screenshot)
+async function viewWebDoc(id) {
+  try {
+    const res = await fetch(`/api/reports/${id}`);
+    const result = await res.json();
+    if (!result.success) return alert('ไม่พบข้อมูล');
+
+    const data = result.data;
+    const docContainer = document.getElementById('a4PreviewDoc');
+    docContainer.className = 'modal-content web-doc';
+
+    let attachmentsHTML = '';
+    if (data.attachments && data.attachments.length > 0) {
+      attachmentsHTML = `
+        <div class="doc-images-grid">
+          ${data.attachments.map(att => `<img src="${att.file_path}" alt="หลักฐาน">`).join('')}
+        </div>
+      `;
+    }
+
+    docContainer.innerHTML = `
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:16px;">
+        <div>
+          <h2 style="color:#38bdf8; font-size:1.4rem;">📝 รายงานผลการอบรม (มุมมองดิจิทัล)</h2>
+          <p style="color:var(--text-secondary); font-size:0.9rem;">${data.school_name} ${data.district} ${data.province} (ปีการศึกษา ${data.academic_year})</p>
+        </div>
+        <button class="btn btn-primary" onclick="viewPrintDoc(${data.id})">🖨️ สลับไปหน้าพิมพ์ A4 ทางการ</button>
+      </div>
+
+      <div class="form-grid">
+        <div class="col-6 web-report-field">
+          <label>1. ผู้เข้าร่วมอบรม</label>
+          <div class="value"><strong>${data.teacher_name} ${data.teacher_surname}</strong> (${data.position || '-'} / ${data.academic_standing || '-'})</div>
+        </div>
+        <div class="col-6 web-report-field">
+          <label>2. อบรมเรื่อง</label>
+          <div class="value"><strong>${data.topic}</strong></div>
+        </div>
+        <div class="col-4 web-report-field">
+          <label>3. วันที่เข้าอบรม</label>
+          <div class="value">${data.training_date || '-'}</div>
+        </div>
+        <div class="col-4 web-report-field">
+          <label>4. หน่วยงานที่จัด</label>
+          <div class="value">${data.organizer || '-'}</div>
+        </div>
+        <div class="col-4 web-report-field">
+          <label>5-6. สถานที่ & งบประมาณ</label>
+          <div class="value">${data.location || '-'} (${Number(data.budget || 0).toLocaleString()} บาท)</div>
+        </div>
+
+        <div class="col-12 web-report-field">
+          <label>7. สรุปความรู้ที่ได้รับ</label>
+          <div class="value">${data.knowledge_summary || '-'}</div>
+        </div>
+
+        <div class="col-12 web-report-field">
+          <label>8. วิธีการ/แนวทางขยายผล</label>
+          <div class="value">${data.dissemination_plan || '-'}</div>
+        </div>
+
+        <div class="col-12 web-report-field">
+          <label>9. ข้อเสนอแนะเพิ่มเติม</label>
+          <div class="value">${data.suggestions || '-'}</div>
+        </div>
+
+        <div class="col-12 web-report-field">
+          <label>10. เอกสาร/หลักฐานรูปภาพแนบ</label>
+          ${attachmentsHTML || '<div style="color:var(--text-muted);">ไม่มีรูปภาพแนบ</div>'}
+        </div>
+      </div>
+    `;
+
+    document.getElementById('printModal').style.display = 'flex';
+
+  } catch (err) {
+    console.error(err);
+  }
+}
+
 // Generate & Open A4 Formal Print Document Modal
 async function viewPrintDoc(id) {
   try {
@@ -285,6 +366,7 @@ async function viewPrintDoc(id) {
 
     const data = result.data;
     const docContainer = document.getElementById('a4PreviewDoc');
+    docContainer.className = 'modal-content a4-doc';
 
     // Attachments HTML
     let attachmentsHTML = '';
