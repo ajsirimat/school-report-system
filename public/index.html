@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ระบบรายงานการอบรม/ศึกษาดูงาน - โรงเรียนวังน้ำเย็นวิทยาคม</title>
+
+  <!-- Google Fonts: Sarabun & Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Sarabun:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
+
+  <!-- Quill Rich Text Editor Styles -->
+  <link href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css" rel="stylesheet" />
+
+  <!-- App Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header>
+      <div class="brand">
+        <div class="brand-icon">🏫</div>
+        <div>
+          <h1>ระบบรายงานผลการอบรม/ศึกษาดูงาน</h1>
+          <p>โรงเรียนวังน้ำเย็นวิทยาคม อำเภอวังน้ำเย็น จังหวัดสระแก้ว</p>
+        </div>
+      </div>
+
+      <nav class="nav-tabs">
+        <button class="tab-btn active" onclick="switchTab('new')">
+          <span>✨</span> บันทึกรายงานใหม่
+        </button>
+        <button class="tab-btn" onclick="switchTab('list')">
+          <span>📋</span> รายการรายงานทั้งหมด
+        </button>
+      </nav>
+    </header>
+
+    <!-- Top Stats Overview Bar -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon blue">📄</div>
+        <div class="stat-info">
+          <div id="stat-total-reports" class="stat-value">0</div>
+          <div class="stat-label">รายงานการอบรมทั้งหมด</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon purple">🎓</div>
+        <div class="stat-info">
+          <div id="stat-academic-year" class="stat-value">2569</div>
+          <div class="stat-label">ปีการศึกษาปัจจุบัน</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon emerald">💰</div>
+        <div class="stat-info">
+          <div id="stat-total-budget" class="stat-value">0 ฿</div>
+          <div class="stat-label">งบประมาณพัฒนาครูรวม</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon amber">🖼️</div>
+        <div class="stat-info">
+          <div id="stat-total-files" class="stat-value">0</div>
+          <div class="stat-label">วุฒิบัตร/ภาพกิจกรรมแนบ</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 1: Form -->
+    <main id="tab-new" class="tab-content">
+      <div class="card">
+        <div class="card-header-bar">
+          <h2 class="card-title">📝 แบบฟอร์มรายงานผลการประชุม/อบรม/สัมมนา/ศึกษาดูงาน</h2>
+          <span class="section-badge">📄 เอกสารฉบับทางการ A4</span>
+        </div>
+
+        <form id="reportForm" onsubmit="handleFormSubmit(event)">
+          <div class="form-grid">
+            <!-- Header School info -->
+            <div class="col-4 form-group">
+              <label>ปีการศึกษา</label>
+              <input type="text" class="form-control" name="academic_year" value="2569" required>
+            </div>
+            <div class="col-4 form-group">
+              <label>ชื่อโรงเรียน</label>
+              <input type="text" class="form-control" name="school_name" value="โรงเรียนวังน้ำเย็นวิทยาคม" required>
+            </div>
+            <div class="col-4 form-group">
+              <label>อำเภอ / จังหวัด</label>
+              <input type="text" class="form-control" name="district_province" value="อำเภอวังน้ำเย็น จังหวัดสระแก้ว" required>
+            </div>
+
+            <!-- Item 1 -->
+            <div class="col-3 form-group">
+              <label>1. ชื่อผู้เข้าร่วม</label>
+              <input type="text" class="form-control" name="teacher_name" placeholder="ชื่อ" required>
+            </div>
+            <div class="col-3 form-group">
+              <label>นามสกุล</label>
+              <input type="text" class="form-control" name="teacher_surname" placeholder="นามสกุล" required>
+            </div>
+            <div class="col-3 form-group">
+              <label>ตำแหน่ง</label>
+              <input type="text" class="form-control" name="position" placeholder="เช่น ครู คศ.1">
+            </div>
+            <div class="col-3 form-group">
+              <label>วิทยฐานะ</label>
+              <input type="text" class="form-control" name="academic_standing" placeholder="เช่น ชำนาญการ">
+            </div>
+
+            <!-- Item 2 -->
+            <div class="col-12 form-group">
+              <label>2. ประชุม/อบรม/สัมมนา/ศึกษาดูงาน เรื่อง</label>
+              <input type="text" class="form-control" name="topic" placeholder="ระบุชื่อหลักสูตร หรือ หัวข้อเรื่องการอบรม" required>
+            </div>
+
+            <!-- Item 3, 4, 5, 6 -->
+            <div class="col-3 form-group">
+              <label>3. วัน/เดือน/ปี ที่เข้าอบรม</label>
+              <input type="text" class="form-control" name="training_date" placeholder="เช่น 20-21 กรกฎาคม 2569">
+            </div>
+            <div class="col-3 form-group">
+              <label>4. หน่วยงานที่จัดอบรม</label>
+              <input type="text" class="form-control" name="organizer" placeholder="เช่น สพม.สระแก้ว / กระทรวงศึกษาธิการ">
+            </div>
+            <div class="col-3 form-group">
+              <label>5. สถานที่/จังหวัด</label>
+              <input type="text" class="form-control" name="location" placeholder="เช่น รร.วังน้ำเย็นฯ / โรงแรมสระแก้ว">
+            </div>
+            <div class="col-3 form-group">
+              <label>6. งบประมาณที่ใช้ (บาท)</label>
+              <input type="number" class="form-control" name="budget" placeholder="0" value="0">
+            </div>
+
+            <!-- Item 7: Rich Text Editor -->
+            <div class="col-12 form-group">
+              <label>7. สรุปความรู้ที่ได้รับ <span style="font-size:0.8rem; color:var(--text-muted);">(จัดรูปแบบข้อความได้ด้วย Web Editor)</span></label>
+              <div id="editor-knowledge"></div>
+            </div>
+
+            <!-- Item 8: Rich Text Editor -->
+            <div class="col-12 form-group">
+              <label>8. วิธีการ/แนวทาง ขยายผลให้ครู/บุคลากรในกลุ่มสาระฯ/ครูในโรงเรียน</label>
+              <div id="editor-dissemination"></div>
+            </div>
+
+            <!-- Item 9: Rich Text Editor -->
+            <div class="col-12 form-group">
+              <label>9. ข้อเสนอแนะเพิ่มเติม</label>
+              <div id="editor-suggestions"></div>
+            </div>
+
+            <!-- Item 10: File Upload Zone -->
+            <div class="col-12 form-group">
+              <label>10. เอกสาร/หลักฐานที่ได้จากการสัมมนา (วุฒิบัตร หรือ ภาพถ่าย)</label>
+              <div class="upload-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
+                <div class="upload-icon">☁️</div>
+                <div class="upload-title">คลิกเพื่ออัปโหลดไฟล์ หรือ ลากรูปภาพมาวางที่นี่</div>
+                <div class="upload-sub">รองรับไฟล์ JPG, PNG, PDF (เลือกได้หลายไฟล์)</div>
+                <input type="file" id="fileInput" multiple accept="image/*,.pdf" style="display:none" onchange="handleFileSelect(event)">
+              </div>
+              <div id="filePreview" class="preview-grid"></div>
+            </div>
+
+            <!-- Form Action Controls -->
+            <div class="col-12" style="margin-top: 16px; display: flex; gap: 14px; justify-content: flex-end;">
+              <button type="button" class="btn btn-secondary" onclick="resetForm()">🔄 ล้างข้อมูล</button>
+              <button type="submit" class="btn btn-primary">💾 บันทึกรายงานเข้าฐานข้อมูล</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </main>
+
+    <!-- Tab 2: Saved Reports List -->
+    <main id="tab-list" class="tab-content" style="display: none;">
+      <div class="card">
+        <div class="card-header-bar">
+          <h2 class="card-title">📚 รายการรายงานผลการอบรมในฐานข้อมูล</h2>
+          <span class="section-badge" id="report-count-badge">0 รายการ</span>
+        </div>
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>ครูผู้รายงาน</th>
+                <th>หัวข้อเรื่องที่อบรม</th>
+                <th>วันที่อบรม</th>
+                <th>ปีการศึกษา</th>
+                <th style="text-align: right;">การจัดการ</th>
+              </tr>
+            </thead>
+            <tbody id="reportsTableBody">
+              <tr>
+                <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 40px;">กำลังโหลดข้อมูลจากฐานข้อมูล...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal A4 Print Preview -->
+  <div id="printModal" class="modal-overlay" style="display: none;">
+    <div class="modal-actions">
+      <button class="btn btn-success" onclick="window.print()">🖨️ พิมพ์เอกสาร / บันทึก PDF</button>
+      <button class="btn btn-secondary" onclick="closePrintModal()">❌ ปิด</button>
+    </div>
+
+    <div id="a4PreviewDoc" class="modal-content a4-doc">
+      <!-- Generated A4 Content -->
+    </div>
+  </div>
+
+  <!-- Quill JS Library -->
+  <script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
+
+  <!-- App Script -->
+  <script src="app.js"></script>
+</body>
+</html>
