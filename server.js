@@ -8,7 +8,7 @@ const db = require('./db');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Ensure upload directory exists
+// Ensure local upload directory exists (used for SQLite fallback or temp storage)
 const uploadDir = path.join(__dirname, 'uploads');
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
@@ -36,56 +36,67 @@ app.use('/uploads', express.static(uploadDir));
 // --- API ENDPOINTS ---
 
 // 1. Create a new training report
-app.post('/api/reports', (req, res) => {
+app.post('/api/reports', async (req, res) => {
   try {
-    const {
-      teacher_name,
-      teacher_surname,
-      position,
-      academic_standing,
-      topic,
-      training_date,
-      organizer,
-      location,
-      budget,
-      knowledge_summary,
-      dissemination_plan,
-      suggestions,
-      school_name,
-      district,
-      province,
-      academic_year
-    } = req.body;
+    const payload = {
+      teacher_name: req.body.teacher_name || '',
+      teacher_surname: req.body.teacher_surname || '',
+      position: req.body.position || '',
+      academic_standing: req.body.academic_standing || '',
+      topic: req.body.topic || '',
+      training_date: req.body.training_date || '',
+      organizer: req.body.organizer || '',
+      location: req.body.location || '',
+      budget: req.body.budget ? parseFloat(req.body.budget) : 0,
+      knowledge_summary: req.body.knowledge_summary || '',
+      dissemination_plan: req.body.dissemination_plan || '',
+      suggestions: req.body.suggestions || '',
+      school_name: req.body.school_name || 'โรงเรียนวังน้ำเย็นวิทยาคม',
+      district: req.body.district_province ? req.body.district_province.split(' ')[0] : 'อำเภอวังน้ำเย็น',
+      province: req.body.district_province && req.body.district_province.split(' ').length > 1 ? req.body.district_province.split(' ')[1] : 'จังหวัดสระแก้ว',
+      academic_year: req.body.academic_year || '2569'
+    };
 
-    const stmt = db.prepare(`
-      INSERT INTO reports (
-        teacher_name, teacher_surname, position, academic_standing,
-        topic, training_date, organizer, location, budget,
-        knowledge_summary, dissemination_plan, suggestions,
-        school_name, district, province, academic_year
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `);
+    if (db.type === 'supabase') {
+      const { data, error } = await db.client
+        .from('reports')
+        .insert([payload])
+        .select();
 
-    const info = stmt.run(
-      teacher_name || '',
-      teacher_surname || '',
-      position || '',
-      academic_standing || '',
-      topic || '',
-      training_date || '',
-      organizer || '',
-      location || '',
-      budget ? parseFloat(budget) : 0,
-      knowledge_summary || '',
-      dissemination_plan || '',
-      suggestions || '',
-      school_name || 'โรงเรียนวังน้ำเย็นวิทยาคม',
-      district || 'อำเภอวังน้ำเย็น',
-      province || 'จังหวัดสระแก้ว',
-      academic_year || '2569'
-    );
+      if (error) throw error;
+      return res.json({ success: true, reportId: data[0].id, message: 'บันทึกรายงานลง Supabase สำเร็จ' });
+    } else {
+      // Local SQLite
+      const stmt = db.client.prepare(`
+        INSERT INTO reports (
+          teacher_name, teacher_surname, position, academic_standing,
+          topic, training_date, organizer, location, budget,
+          knowledge_summary, dissemination_plan, suggestions,
+          school_name, district, province, academic_year
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `);
 
-    res.json({ success: true, reportId: info.lastInsertRowid, message: 'บันทึกรายงานสำเร็จ' });
+      const info = stmt.run(
+        payload.teacher_name,
+        payload.teacher_surname,
+        payload.position,
+        payload.academic_standing,
+        payload.topic,
+        payload.training_date,
+        payload.organizer,
+        payload.location,
+        payload.budget,
+        payload.knowledge_summary,
+        payload.dissemination_plan,
+        payload.suggestions,
+        payload.school_name,
+        payload.district,
+        payload.province,
+        payload.academic_year
+      );
+
+      return res.json({ success: true, reportId: info.lastInsertRowid, message: 'บันทึกรายงานลง SQLite สำเร็จ' });
+    }
   } catch (err) {
     console.error('Error saving report:', err);
     res.status(500).json({ success: false, error: err.message });
@@ -93,7 +104,7 @@ app.post('/api/reports', (req, res) => {
 });
 
 // 2. Upload file attachments for a report
-app.post('/api/upload/:reportId', upload.array('attachments', 10), (req, res) => {
+app.post('/api/upload/:reportId', upload.array('attachments', 10), async (req, res) => {
   try {
     const reportId = req.params.reportId;
     const files = req.files;
@@ -102,21 +113,67 @@ app.post('/api/upload/:reportId', upload.array('attachments', 10), (req, res) =>
       return res.json({ success: true, message: 'ไม่มีไฟล์แนบ' });
     }
 
-    const stmt = db.prepare(`
-      INSERT INTO attachments (report_id, file_name, file_path, file_type)
-      VALUES (?, ?, ?, ?)
-    `);
+    if (db.type === 'supabase') {
+      for (const file of files) {
+        const fileContent = fs.readFileSync(file.path);
+        const fileName = `reports/${reportId}/${file.filename}`;
 
-    const insertMany = db.transaction((fileList) => {
-      for (const file of fileList) {
-        const fileUrl = '/uploads/' + file.filename;
-        stmt.run(reportId, file.originalname, fileUrl, file.mimetype);
+        // Upload to Supabase Storage Bucket 'school-reports'
+        const { data: uploadData, error: uploadError } = await db.client
+          .storage
+          .from('school-reports')
+          .upload(fileName, fileContent, {
+            contentType: file.mimetype,
+            upsert: true
+          });
+
+        if (uploadError) {
+          console.error('Supabase Storage error:', uploadError);
+          continue;
+        }
+
+        // Get Public URL
+        const { data: publicUrlData } = db.client
+          .storage
+          .from('school-reports')
+          .getPublicUrl(fileName);
+
+        const publicUrl = publicUrlData.publicUrl;
+
+        // Insert metadata into attachments table
+        const { error: insertError } = await db.client
+          .from('attachments')
+          .insert([{
+            report_id: parseInt(reportId),
+            file_name: file.originalname,
+            file_path: publicUrl,
+            file_type: file.mimetype
+          }]);
+
+        if (insertError) console.error('Database attachment error:', insertError);
+
+        // Delete temporary local file
+        fs.unlinkSync(file.path);
       }
-    });
 
-    insertMany(files);
+      res.json({ success: true, message: `อัปโหลดไฟล์ไปที่ Supabase Storage สำเร็จ` });
+    } else {
+      // Local SQLite
+      const stmt = db.client.prepare(`
+        INSERT INTO attachments (report_id, file_name, file_path, file_type)
+        VALUES (?, ?, ?, ?)
+      `);
 
-    res.json({ success: true, message: `อัปโหลด ${files.length} ไฟล์สำเร็จ` });
+      const insertMany = db.client.transaction((fileList) => {
+        for (const file of fileList) {
+          const fileUrl = '/uploads/' + file.filename;
+          stmt.run(reportId, file.originalname, fileUrl, file.mimetype);
+        }
+      });
+
+      insertMany(files);
+      res.json({ success: true, message: `อัปโหลดไฟล์ไปที่ SQLite สำเร็จ` });
+    }
   } catch (err) {
     console.error('Error uploading files:', err);
     res.status(500).json({ success: false, error: err.message });
@@ -124,34 +181,93 @@ app.post('/api/upload/:reportId', upload.array('attachments', 10), (req, res) =>
 });
 
 // 3. Get all reports
-app.get('/api/reports', (req, res) => {
+app.get('/api/reports', async (req, res) => {
   try {
-    const reports = db.prepare('SELECT * FROM reports ORDER BY id DESC').all();
-    res.json({ success: true, data: reports });
+    if (db.type === 'supabase') {
+      const { data, error } = await db.client
+        .from('reports')
+        .select('*')
+        .order('id', { ascending: false });
+
+      if (error) throw error;
+      res.json({ success: true, data });
+    } else {
+      const reports = db.client.prepare('SELECT * FROM reports ORDER BY id DESC').all();
+      res.json({ success: true, data: reports });
+    }
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
 });
 
 // 4. Get a single report with attachments
-app.get('/api/reports/:id', (req, res) => {
+app.get('/api/reports/:id', async (req, res) => {
   try {
-    const report = db.prepare('SELECT * FROM reports WHERE id = ?').get(req.params.id);
-    if (!report) {
-      return res.status(404).json({ success: false, error: 'ไม่พบรายงาน' });
+    const reportId = req.params.id;
+
+    if (db.type === 'supabase') {
+      const { data: report, error: reportError } = await db.client
+        .from('reports')
+        .select('*')
+        .eq('id', reportId)
+        .single();
+
+      if (reportError || !report) {
+        return res.status(404).json({ success: false, error: 'ไม่พบรายงาน' });
+      }
+
+      const { data: attachments } = await db.client
+        .from('attachments')
+        .select('*')
+        .eq('report_id', reportId);
+
+      res.json({ success: true, data: { ...report, attachments } });
+    } else {
+      const report = db.client.prepare('SELECT * FROM reports WHERE id = ?').get(reportId);
+      if (!report) {
+        return res.status(404).json({ success: false, error: 'ไม่พบรายงาน' });
+      }
+      const attachments = db.client.prepare('SELECT * FROM attachments WHERE report_id = ?').all(reportId);
+      res.json({ success: true, data: { ...report, attachments } });
     }
-    const attachments = db.prepare('SELECT * FROM attachments WHERE report_id = ?').all(req.params.id);
-    res.json({ success: true, data: { ...report, attachments } });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
 });
 
 // 5. Delete report
-app.delete('/api/reports/:id', (req, res) => {
+app.delete('/api/reports/:id', async (req, res) => {
   try {
-    db.prepare('DELETE FROM reports WHERE id = ?').run(req.params.id);
-    res.json({ success: true, message: 'ลบรายงานสำเร็จ' });
+    const reportId = req.params.id;
+
+    if (db.type === 'supabase') {
+      // Get all attachments first to delete files from storage if needed
+      const { data: attachments } = await db.client
+        .from('attachments')
+        .select('*')
+        .eq('report_id', reportId);
+
+      if (attachments && attachments.length > 0) {
+        for (const att of attachments) {
+          // Extract filename from URL to delete from storage
+          const fileUri = att.file_path.split('/school-reports/')[1];
+          if (fileUri) {
+            await db.client.storage.from('school-reports').remove([fileUri]);
+          }
+        }
+      }
+
+      const { error } = await db.client
+        .from('reports')
+        .delete()
+        .eq('id', reportId);
+
+      if (error) throw error;
+      res.json({ success: true, message: 'ลบรายงานใน Supabase สำเร็จ' });
+    } else {
+      db.client.prepare('DELETE FROM reports WHERE id = ?').run(reportId);
+      res.json({ success: true, message: 'ลบรายงานใน SQLite สำเร็จ' });
+    }
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
