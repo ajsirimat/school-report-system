@@ -380,59 +380,85 @@ async function viewPrintDoc(id) {
 
     // Format output matching official school document in user's image
     docContainer.innerHTML = `
-      <div class="doc-header">
-        <h2>แบบรายงานผลการประชุม/อบรม/สัมมนา/ศึกษาดูงานของครูและบุคลากรทางการศึกษา</h2>
-        <h2>${data.school_name} ${data.district} ${data.province}</h2>
-        <h3>ประจำปีการศึกษา ${data.academic_year}</h3>
+      <div class="doc-logo-container" style="display: flex; justify-content: center; margin-bottom: 20px;">
+        <svg viewBox="0 0 100 100" width="85" height="85" style="filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.1));">
+          <!-- Elegant Crest: WANGNAMYEN WITTAYAKOM SCHOOL -->
+          <circle cx="50" cy="50" r="46" fill="none" stroke="#1e3a8a" stroke-width="3" />
+          <circle cx="50" cy="50" r="42" fill="none" stroke="#1e3a8a" stroke-width="1" stroke-dasharray="3,3" />
+          <path d="M50,15 L78,38 L68,78 L32,78 L22,38 Z" fill="none" stroke="#1e3a8a" stroke-width="2.5" />
+          <path d="M50,19 L74,38 L65,74 L35,74 L26,38 Z" fill="#1e3a8a" opacity="0.12" />
+          <!-- Flame Emblem -->
+          <path d="M50,22 Q58,35 50,48 Q42,35 50,22 Z" fill="#b91c1c" />
+          <!-- Book -->
+          <path d="M36,64 Q50,60 64,64 L64,52 Q50,48 36,52 Z" fill="#1e3a8a" />
+          <path d="M50,50 L50,62" stroke="#ffffff" stroke-width="1.5" />
+          <text x="50" y="72" font-family="'Sarabun', sans-serif" font-size="9" fill="#1e3a8a" font-weight="bold" text-anchor="middle">ว.ย.ว.</text>
+        </svg>
       </div>
 
-      <div style="line-height: 1.8;">
-        <p class="doc-field">
-          1. ผู้เข้าร่วมประชุม/อบรม/สัมมนา/ศึกษาดูงาน ชื่อ <span class="dotted-line">&nbsp;${data.teacher_name}&nbsp;</span>
-          สกุล <span class="dotted-line">&nbsp;${data.teacher_surname}&nbsp;</span><br>
-          ตำแหน่ง <span class="dotted-line">&nbsp;${data.position || '-'}&nbsp;</span>
-          วิทยฐานะ <span class="dotted-line">&nbsp;${data.academic_standing || '-'}&nbsp;</span>
+      <div class="doc-header" style="text-align: center; margin-bottom: 30px; line-height: 1.5;">
+        <h2 style="font-size: 16pt; font-weight: bold; margin: 0; color: #111827;">แบบรายงานผลการประชุม/อบรม/สัมมนา/ศึกษาดูงานของครูและบุคลากรทางการศึกษา</h2>
+        <h3 style="font-size: 15pt; font-weight: bold; margin: 6px 0 0 0; color: #1f2937;">${data.school_name} ${data.district} ${data.province}</h3>
+        <h4 style="font-size: 14pt; font-weight: normal; margin: 4px 0 0 0; color: #4b5563;">ประจำปีการศึกษา ${data.academic_year}</h4>
+      </div>
+
+      <div style="line-height: 1.85; font-size: 15pt; color: #1f2937;">
+        <p class="doc-field" style="margin-bottom: 12px; text-indent: 1.25cm;">
+          1. ผู้เข้าร่วมประชุม/อบรม/สัมมนา/ศึกษาดูงาน ชื่อ <span class="dotted-line" style="display: inline-block; min-width: 160px; text-align: center; border-bottom: 1px dotted #374151; color: #1e3b8b; font-weight: bold; padding: 0 4px;">&nbsp;${data.teacher_name}&nbsp;</span>
+          สกุล <span class="dotted-line" style="display: inline-block; min-width: 180px; text-align: center; border-bottom: 1px dotted #374151; color: #1e3b8b; font-weight: bold; padding: 0 4px;">&nbsp;${data.teacher_surname}&nbsp;</span><br>
+          ตำแหน่ง <span class="dotted-line" style="display: inline-block; min-width: 180px; text-align: center; border-bottom: 1px dotted #374151; color: #1e3b8b; font-weight: bold; padding: 0 4px;">&nbsp;${data.position || '-'}&nbsp;</span>
+          วิทยฐานะ <span class="dotted-line" style="display: inline-block; min-width: 180px; text-align: center; border-bottom: 1px dotted #374151; color: #1e3b8b; font-weight: bold; padding: 0 4px;">&nbsp;${data.academic_standing || '-'}&nbsp;</span>
         </p>
 
-        <p class="doc-field">
-          2. ประชุม/อบรม/สัมมนา/ศึกษาดูงาน เรื่อง <span class="dotted-line">&nbsp;${data.topic}&nbsp;</span>
+        <p class="doc-field" style="margin-bottom: 12px; text-indent: 1.25cm;">
+          2. ประชุม/อบรม/สัมมนา/ศึกษาดูงาน เรื่อง <span class="dotted-line" style="display: inline; border-bottom: 1px dotted #374151; color: #1e3b8b; font-weight: bold; padding: 0 4px;">&nbsp;${data.topic}&nbsp;</span>
         </p>
 
-        <p class="doc-field">
-          3. วัน/เดือน/ปี ที่เข้าอบรม <span class="dotted-line">&nbsp;${data.training_date || '-'}&nbsp;</span>
+        <p class="doc-field" style="margin-bottom: 12px; text-indent: 1.25cm;">
+          3. วัน/เดือน/ปี ที่เข้าอบรม <span class="dotted-line" style="display: inline-block; min-width: 250px; text-align: center; border-bottom: 1px dotted #374151; color: #1e3b8b; font-weight: bold; padding: 0 4px;">&nbsp;${data.training_date || '-'}&nbsp;</span>
         </p>
 
-        <p class="doc-field">
-          4. หน่วยงานที่จัดอบรม <span class="dotted-line">&nbsp;${data.organizer || '-'}&nbsp;</span>
+        <p class="doc-field" style="margin-bottom: 12px; text-indent: 1.25cm;">
+          4. หน่วยงานที่จัดอบรม <span class="dotted-line" style="display: inline; border-bottom: 1px dotted #374151; color: #1e3b8b; font-weight: bold; padding: 0 4px;">&nbsp;${data.organizer || '-'}&nbsp;</span>
         </p>
 
-        <p class="doc-field">
-          5. สถานที่/จังหวัด <span class="dotted-line">&nbsp;${data.location || '-'}&nbsp;</span>
+        <p class="doc-field" style="margin-bottom: 12px; text-indent: 1.25cm;">
+          5. สถานที่/จังหวัด <span class="dotted-line" style="display: inline; border-bottom: 1px dotted #374151; color: #1e3b8b; font-weight: bold; padding: 0 4px;">&nbsp;${data.location || '-'}&nbsp;</span>
         </p>
 
-        <p class="doc-field">
-          6. งบประมาณที่ใช้ <span class="dotted-line">&nbsp;${data.budget ? Number(data.budget).toLocaleString() + ' บาท' : '-'}&nbsp;</span>
+        <p class="doc-field" style="margin-bottom: 24px; text-indent: 1.25cm;">
+          6. งบประมาณที่ใช้ <span class="dotted-line" style="display: inline-block; min-width: 150px; text-align: center; border-bottom: 1px dotted #374151; color: #1e3b8b; font-weight: bold; padding: 0 4px;">&nbsp;${data.budget ? Number(data.budget).toLocaleString() + ' บาท' : '-'}&nbsp;</span>
         </p>
 
-        <div class="doc-field">
-          <p>7. สรุปความรู้ที่ได้รับ</p>
-          <div class="doc-red-content">${data.knowledge_summary || '-'}</div>
+        <div class="doc-field" style="margin-bottom: 20px;">
+          <p style="font-weight: bold; color: #111827; margin-bottom: 4px;">7. สรุปความรู้ที่ได้รับ</p>
+          <div class="doc-red-content" style="padding-left: 1.25cm; text-align: justify;">${data.knowledge_summary || '-'}</div>
         </div>
 
-        <div class="doc-field" style="margin-top: 10px;">
-          <p>8. วิธีการ/แนวทาง ขยายผลให้ครู/บุคลากรในกลุ่มสาระฯ/ครูในโรงเรียน</p>
-          <div class="doc-red-content">${data.dissemination_plan || '-'}</div>
+        <div class="doc-field" style="margin-bottom: 20px;">
+          <p style="font-weight: bold; color: #111827; margin-bottom: 4px;">8. วิธีการ/แนวทาง ขยายผลให้ครู/บุคลากรในกลุ่มสาระฯ/ครูในโรงเรียน</p>
+          <div class="doc-red-content" style="padding-left: 1.25cm; text-align: justify;">${data.dissemination_plan || '-'}</div>
         </div>
 
-        <div class="doc-field" style="margin-top: 10px;">
-          <p>9. ข้อเสนอแนะเพิ่มเติม</p>
-          <div class="doc-red-content">${data.suggestions || '-'}</div>
+        <div class="doc-field" style="margin-bottom: 20px;">
+          <p style="font-weight: bold; color: #111827; margin-bottom: 4px;">9. ข้อเสนอแนะเพิ่มเติม</p>
+          <div class="doc-red-content" style="padding-left: 1.25cm; text-align: justify;">${data.suggestions || '-'}</div>
         </div>
 
-        <div class="doc-field" style="margin-top: 10px;">
-          <p>10. เอกสาร/หลักฐานที่ได้จากการสัมมนา ได้แก่ วุฒิบัตร หรือ ภาพถ่าย หรือทั้งสองอย่าง (ถ้ามี)</p>
-          ${attachmentsHTML}
+        <div class="doc-field" style="margin-bottom: 30px; page-break-inside: avoid;">
+          <p style="font-weight: bold; color: #111827; margin-bottom: 8px;">10. เอกสาร/หลักฐานที่ได้จากการสัมมนา ได้แก่ วุฒิบัตร หรือ ภาพถ่าย หรือทั้งสองอย่าง (ถ้ามี)</p>
+          <div style="padding-left: 1.25cm;">
+            ${attachmentsHTML || '<div style="color: #6b7280; font-style: italic;">ไม่มีเอกสารแนบ</div>'}
+          </div>
         </div>
+
+        <!-- Signature Block -->
+        <div class="doc-signature-block" style="margin-top: 40px; margin-right: 20px; float: right; text-align: center; min-width: 280px; line-height: 2.2; page-break-inside: avoid;">
+          <p style="margin: 0;">ลงชื่อ......................................................ผู้รายงาน</p>
+          <p style="margin: 0;">( <span style="font-weight: bold; color: #111827;">${data.teacher_name} ${data.teacher_surname}</span> )</p>
+          <p style="margin: 0;">ตำแหน่ง <span style="font-weight: normal; color: #374151;">${data.position || '-'}</span></p>
+        </div>
+        <div style="clear: both;"></div>
       </div>
     `;
 
