@@ -381,19 +381,7 @@ async function viewPrintDoc(id) {
     // Format output matching official school document in user's image
     docContainer.innerHTML = `
       <div class="doc-logo-container" style="display: flex; justify-content: center; margin-bottom: 20px;">
-        <svg viewBox="0 0 100 100" width="85" height="85" style="filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.1));">
-          <!-- Elegant Crest: WANGNAMYEN WITTAYAKOM SCHOOL -->
-          <circle cx="50" cy="50" r="46" fill="none" stroke="#1e3a8a" stroke-width="3" />
-          <circle cx="50" cy="50" r="42" fill="none" stroke="#1e3a8a" stroke-width="1" stroke-dasharray="3,3" />
-          <path d="M50,15 L78,38 L68,78 L32,78 L22,38 Z" fill="none" stroke="#1e3a8a" stroke-width="2.5" />
-          <path d="M50,19 L74,38 L65,74 L35,74 L26,38 Z" fill="#1e3a8a" opacity="0.12" />
-          <!-- Flame Emblem -->
-          <path d="M50,22 Q58,35 50,48 Q42,35 50,22 Z" fill="#b91c1c" />
-          <!-- Book -->
-          <path d="M36,64 Q50,60 64,64 L64,52 Q50,48 36,52 Z" fill="#1e3a8a" />
-          <path d="M50,50 L50,62" stroke="#ffffff" stroke-width="1.5" />
-          <text x="50" y="72" font-family="'Sarabun', sans-serif" font-size="9" fill="#1e3a8a" font-weight="bold" text-anchor="middle">ว.ย.ว.</text>
-        </svg>
+        <img src="/school-logo.png" alt="ตราโรงเรียนวังน้ำเย็นวิทยาคม" style="height: 120px; object-fit: contain; filter: drop-shadow(0px 2px 5px rgba(0,0,0,0.15));">
       </div>
 
       <div class="doc-header" style="text-align: center; margin-bottom: 30px; line-height: 1.5;">
