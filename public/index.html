@@ -120,8 +120,14 @@
 
             <!-- Item 3, 4, 5, 6 -->
             <div class="col-3 form-group">
-              <label>3. วัน/เดือน/ปี ที่เข้าอบรม</label>
-              <input type="text" class="form-control" name="training_date" placeholder="เช่น 20-21 กรกฎาคม 2569">
+              <label>3. วันที่เข้าอบรม (เริ่มต้น - สิ้นสุด)</label>
+              <div style="display: flex; gap: 6px; align-items: center;">
+                <input type="date" class="form-control" id="startDateInput" onchange="updateTrainingDate()" required style="padding: 10px 8px; font-size: 0.9rem;">
+                <span style="color: var(--text-muted); font-size: 0.85rem;">ถึง</span>
+                <input type="date" class="form-control" id="endDateInput" onchange="updateTrainingDate()" style="padding: 10px 8px; font-size: 0.9rem;">
+              </div>
+              <input type="hidden" name="training_date" id="trainingDateHidden">
+              <div id="datePreviewText" style="font-size: 0.8rem; color: var(--accent-cyan); margin-top: 4px; font-weight: 600;"></div>
             </div>
             <div class="col-3 form-group">
               <label>4. หน่วยงานที่จัดอบรม</label>

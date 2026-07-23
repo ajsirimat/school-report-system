@@ -137,6 +137,57 @@ function renderFilePreview() {
   });
 }
 
+// Format Thai Date Range (Buddhist Era)
+function formatThaiDateRange(startDateVal, endDateVal) {
+  if (!startDateVal) return '';
+
+  const thaiMonths = [
+    'มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน',
+    'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'
+  ];
+
+  const start = new Date(startDateVal);
+  if (isNaN(start.getTime())) return '';
+  const startDay = start.getDate();
+  const startMonth = start.getMonth();
+  const startYear = start.getFullYear() + 543; // Buddhist Era
+
+  if (!endDateVal || startDateVal === endDateVal) {
+    return `${startDay} ${thaiMonths[startMonth]} ${startYear}`;
+  }
+
+  const end = new Date(endDateVal);
+  if (isNaN(end.getTime())) {
+    return `${startDay} ${thaiMonths[startMonth]} ${startYear}`;
+  }
+  const endDay = end.getDate();
+  const endMonth = end.getMonth();
+  const endYear = end.getFullYear() + 543; // Buddhist Era
+
+  if (startYear === endYear) {
+    if (startMonth === endMonth) {
+      return `${startDay}-${endDay} ${thaiMonths[startMonth]} ${startYear}`;
+    } else {
+      return `${startDay} ${thaiMonths[startMonth]} - ${endDay} ${thaiMonths[endMonth]} ${startYear}`;
+    }
+  } else {
+    return `${startDay} ${thaiMonths[startMonth]} ${startYear} - ${endDay} ${thaiMonths[endMonth]} ${endYear}`;
+  }
+}
+
+// Update Hidden Field and Preview Text
+function updateTrainingDate() {
+  const startVal = document.getElementById('startDateInput').value;
+  const endVal = document.getElementById('endDateInput').value;
+  const formatted = formatThaiDateRange(startVal, endVal);
+
+  document.getElementById('trainingDateHidden').value = formatted;
+  const preview = document.getElementById('datePreviewText');
+  if (preview) {
+    preview.innerText = formatted ? `แสดงผลในรายงาน: ${formatted}` : '';
+  }
+}
+
 function resetForm() {
   document.getElementById('reportForm').reset();
   quillKnowledge.setContents([]);
@@ -144,6 +195,8 @@ function resetForm() {
   quillSuggestions.setContents([]);
   selectedFiles = [];
   renderFilePreview();
+  const preview = document.getElementById('datePreviewText');
+  if (preview) preview.innerText = '';
 }
 
 // Handle Form Submission
