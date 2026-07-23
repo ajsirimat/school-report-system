@@ -494,14 +494,6 @@ async function viewPrintDoc(id) {
             ${attachmentsHTML || '<div style="color: #6b7280; font-style: italic;">ไม่มีเอกสารแนบ</div>'}
           </div>
         </div>
-
-        <!-- Signature Block -->
-        <div class="doc-signature-block" style="margin-top: 40px; margin-right: 20px; float: right; text-align: center; min-width: 280px; line-height: 2.2; page-break-inside: avoid;">
-          <p style="margin: 0;">ลงชื่อ......................................................ผู้รายงาน</p>
-          <p style="margin: 0;">( <span style="font-weight: bold; color: #111827;">${data.teacher_name} ${data.teacher_surname}</span> )</p>
-          <p style="margin: 0;">ตำแหน่ง <span style="font-weight: normal; color: #374151;">${data.position || '-'}</span></p>
-        </div>
-        <div style="clear: both;"></div>
       </div>
     `;
 
