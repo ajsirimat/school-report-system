@@ -614,9 +614,9 @@ tbody tr:hover {
   padding: 25mm 20mm 20mm 25mm;
   box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.1);
   border-radius: 2px;
-  font-family: 'Sarabun', sans-serif;
+  font-family: 'TH Sarabun New', 'TH Sarabun PSK', 'Sarabun', sans-serif !important;
   font-size: 16pt;
-  line-height: 1.6;
+  line-height: 1.55;
   position: relative;
   margin-bottom: 40px;
 }
@@ -661,36 +661,52 @@ tbody tr:hover {
   margin-bottom: 24px;
 }
 
-.doc-header h2 {
-  font-size: 16pt;
-  font-weight: bold;
-  margin-bottom: 2px;
-  color: #000;
-}
-
-.doc-header h3 {
-  font-size: 16pt;
-  font-weight: normal;
-  color: #111827;
+.doc-header h2, .doc-header h3, .doc-header h4 {
+  font-family: 'TH Sarabun New', 'TH Sarabun PSK', 'Sarabun', sans-serif !important;
+  font-size: 18pt !important;
+  font-weight: bold !important;
+  margin: 0;
+  color: #111827 !important;
+  line-height: 1.4;
 }
 
 .doc-field {
-  margin-bottom: 10px;
+  font-family: 'TH Sarabun New', 'TH Sarabun PSK', 'Sarabun', sans-serif !important;
+  font-size: 18pt !important;
+  font-weight: bold !important;
+  color: #111827 !important;
+  margin-bottom: 12px;
   text-align: justify;
 }
 
 .dotted-line {
   border-bottom: 1px dotted #4b5563;
   padding: 0 8px;
-  color: #1e3a8a;
-  font-weight: 600;
+  color: #1e3a8a !important;
+  font-family: 'TH Sarabun New', 'TH Sarabun PSK', 'Sarabun', sans-serif !important;
+  font-size: 16pt !important;
+  font-weight: normal !important;
 }
 
 .doc-red-content {
-  color: #d9381e; /* Match Thai official sample red color */
-  font-family: 'Sarabun', sans-serif;
+  color: #d9381e !important;
+  font-family: 'TH Sarabun New', 'TH Sarabun PSK', 'Sarabun', sans-serif !important;
+  font-size: 16pt !important;
+  font-weight: normal !important;
   padding-left: 20px;
   margin-top: 4px;
+}
+
+.doc-red-content *,
+.doc-red-content p,
+.doc-red-content span,
+.doc-red-content li,
+.doc-red-content ul,
+.doc-red-content ol {
+  font-family: 'TH Sarabun New', 'TH Sarabun PSK', 'Sarabun', sans-serif !important;
+  font-size: 16pt !important;
+  font-weight: normal !important;
+  color: #d9381e !important;
 }
 
 .doc-images-grid {
@@ -896,6 +912,8 @@ tbody tr:hover {
     box-shadow: none !important;
     margin: 0 !important;
     padding: 15mm 15mm 15mm 20mm !important;
-    width: 100% !important;
+    width: 210mm !important;
+    min-height: 297mm !important;
+    font-family: 'TH Sarabun New', 'TH Sarabun PSK', 'Sarabun', sans-serif !important;
   }
 }
