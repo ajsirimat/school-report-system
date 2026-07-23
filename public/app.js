@@ -217,11 +217,12 @@ async function loadReports() {
 
     if (!result.success || result.data.length === 0) {
       tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 40px;">ยังไม่มีข้อมูลรายงานในฐานข้อมูล</td></tr>`;
-      updateStats([], 0);
+      updateStats([], 0, 0);
       return;
     }
 
     const reports = result.data;
+    const totalAttachments = result.totalAttachments || 0;
     let totalBudget = 0;
 
     tbody.innerHTML = reports.map(item => {
@@ -251,7 +252,7 @@ async function loadReports() {
       `;
     }).join('');
 
-    updateStats(reports, totalBudget);
+    updateStats(reports, totalBudget, totalAttachments);
 
   } catch (err) {
     console.error(err);
@@ -260,10 +261,11 @@ async function loadReports() {
 }
 
 // Update Top Dashboard Stats
-function updateStats(reports, totalBudget) {
+function updateStats(reports, totalBudget, totalAttachments) {
   document.getElementById('stat-total-reports').innerText = reports.length;
   document.getElementById('report-count-badge').innerText = `${reports.length} รายการ`;
   document.getElementById('stat-total-budget').innerText = `${totalBudget.toLocaleString()} ฿`;
+  document.getElementById('stat-total-files').innerText = totalAttachments || 0;
 }
 
 // Delete Report

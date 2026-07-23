@@ -189,6 +189,9 @@ app.post('/api/upload/:reportId', upload.array('attachments', 10), async (req, r
 // 3. Get all reports
 app.get('/api/reports', async (req, res) => {
   try {
+    let reports = [];
+    let totalAttachments = 0;
+
     if (db.type === 'supabase') {
       const { data, error } = await db.client
         .from('reports')
@@ -196,11 +199,23 @@ app.get('/api/reports', async (req, res) => {
         .order('id', { ascending: false });
 
       if (error) throw error;
-      res.json({ success: true, data });
+      reports = data;
+
+      // Get count of attachments
+      const { count, error: countError } = await db.client
+        .from('attachments')
+        .select('*', { count: 'exact', head: true });
+      
+      if (!countError) {
+        totalAttachments = count || 0;
+      }
     } else {
-      const reports = db.client.prepare('SELECT * FROM reports ORDER BY id DESC').all();
-      res.json({ success: true, data: reports });
+      reports = db.client.prepare('SELECT * FROM reports ORDER BY id DESC').all();
+      const countRow = db.client.prepare('SELECT COUNT(*) as count FROM attachments').get();
+      totalAttachments = countRow ? countRow.count : 0;
     }
+
+    res.json({ success: true, data: reports, totalAttachments });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
