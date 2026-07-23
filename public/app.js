@@ -447,8 +447,7 @@ async function viewPrintDoc(id) {
 
       <div style="line-height: 1.85; color: #1f2937;">
         <p class="doc-field" style="margin-bottom: 12px; text-indent: 1.25cm;">
-          1. ผู้เข้าร่วมประชุม/อบรม/สัมมนา/ศึกษาดูงาน ชื่อ <span class="dotted-line" style="display: inline-block; min-width: 160px; text-align: center; border-bottom: 1px dotted #374151; padding: 0 4px;">&nbsp;${data.teacher_name}&nbsp;</span>
-          สกุล <span class="dotted-line" style="display: inline-block; min-width: 180px; text-align: center; border-bottom: 1px dotted #374151; padding: 0 4px;">&nbsp;${data.teacher_surname}&nbsp;</span><br>
+          1. ผู้เข้าร่วมประชุม/อบรม/สัมมนา/ศึกษาดูงาน ชื่อ-สกุล <span class="dotted-line" style="display: inline-block; min-width: 280px; text-align: center; border-bottom: 1px dotted #374151; padding: 0 4px;">&nbsp;${data.teacher_name} ${data.teacher_surname}&nbsp;</span><br>
           ตำแหน่ง <span class="dotted-line" style="display: inline-block; min-width: 180px; text-align: center; border-bottom: 1px dotted #374151; padding: 0 4px;">&nbsp;${data.position || '-'}&nbsp;</span>
           วิทยฐานะ <span class="dotted-line" style="display: inline-block; min-width: 180px; text-align: center; border-bottom: 1px dotted #374151; padding: 0 4px;">&nbsp;${data.academic_standing || '-'}&nbsp;</span>
         </p>
