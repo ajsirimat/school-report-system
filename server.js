@@ -115,10 +115,11 @@ app.post('/api/upload/:reportId', upload.array('attachments', 10), async (req, r
 
     if (db.type === 'supabase') {
       for (const file of files) {
+        let finalPath = '';
         const fileContent = fs.readFileSync(file.path);
         const fileName = `reports/${reportId}/${file.filename}`;
 
-        // Upload to Supabase Storage Bucket 'school-reports'
+        // Try uploading to Supabase Storage Bucket 'school-reports'
         const { data: uploadData, error: uploadError } = await db.client
           .storage
           .from('school-reports')
@@ -128,17 +129,18 @@ app.post('/api/upload/:reportId', upload.array('attachments', 10), async (req, r
           });
 
         if (uploadError) {
-          console.error('Supabase Storage error:', uploadError);
-          continue;
+          console.warn('Supabase Storage upload failed, falling back to Base64 in database:', uploadError.message || uploadError);
+          // Fallback: Convert to Base64 Data URL
+          const base64Data = fileContent.toString('base64');
+          finalPath = `data:${file.mimetype};base64,${base64Data}`;
+        } else {
+          // Get Public URL
+          const { data: publicUrlData } = db.client
+            .storage
+            .from('school-reports')
+            .getPublicUrl(fileName);
+          finalPath = publicUrlData.publicUrl;
         }
-
-        // Get Public URL
-        const { data: publicUrlData } = db.client
-          .storage
-          .from('school-reports')
-          .getPublicUrl(fileName);
-
-        const publicUrl = publicUrlData.publicUrl;
 
         // Insert metadata into attachments table
         const { error: insertError } = await db.client
@@ -146,17 +148,21 @@ app.post('/api/upload/:reportId', upload.array('attachments', 10), async (req, r
           .insert([{
             report_id: parseInt(reportId),
             file_name: file.originalname,
-            file_path: publicUrl,
+            file_path: finalPath,
             file_type: file.mimetype
           }]);
 
-        if (insertError) console.error('Database attachment error:', insertError);
+        if (insertError) {
+          console.error('Database attachment error:', insertError);
+        }
 
         // Delete temporary local file
-        fs.unlinkSync(file.path);
+        if (fs.existsSync(file.path)) {
+          fs.unlinkSync(file.path);
+        }
       }
 
-      res.json({ success: true, message: `อัปโหลดไฟล์ไปที่ Supabase Storage สำเร็จ` });
+      res.json({ success: true, message: `อัปโหลดไฟล์สำเร็จ` });
     } else {
       // Local SQLite
       const stmt = db.client.prepare(`

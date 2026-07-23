@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
     ['bold', 'italic', 'underline'],
     [{ 'color': [] }, { 'background': [] }],
     [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-    ['clean']
+    ['image', 'clean']
   ];
 
   quillKnowledge = new Quill('#editor-knowledge', {
